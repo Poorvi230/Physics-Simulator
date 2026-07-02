@@ -9,6 +9,7 @@
 <body class="space">
 
     <div class="container">
+        <div class="left-panel">
 
         <h1>🚀 Physics Simulator</h1>
         <h2>Projectile Motion Simulator</h2>
@@ -47,15 +48,29 @@
 
         <br><br>
 
+<p>
+    Initial Height:
+    <span id="heightValue">0</span> m
+</p>
+
+        <input type="range"
+               id="height"
+               min="0"
+               max="100"
+               value="0">
+<br><br>
         <button id="launchBtn">
             Launch Rocket
         </button>
 
         <br><br>
 
+        </div>
+        <div class="right-panel">
+
         <canvas id="canvas"
-                width="800"
-                height="400">
+                width="550"
+                height="300">
         </canvas>
 
     </div>

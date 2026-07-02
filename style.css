@@ -16,8 +16,25 @@ body {
     padding: 40px;
     border: 4px solid #38bdf8
     border-radius: 20px;
-    width: 900px;
+    width: 850px;
     text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 40px;
+}
+.left-panel {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 30px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.right-panel {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -65,7 +82,6 @@ button {
     cursor: pointer;
     box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
     transition: all 0.3s ease;
-    animation: pulse 2s infinite;
 }
 
 button:hover {
@@ -79,25 +95,73 @@ canvas {
     border-radius: 20px;
     margin-top: 30px;
     box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
+    height: 320px;
+    width: 600px;
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-
     body.space {
-        background: linear-gradient(135deg, #0f172a, #1e293b);
+        background: radial-gradient(circle at top, #1e3a8a 0%, transparent 30%), linear-gradient(135deg, #020617, #0f172a, #000000);
+    
     }
     body.neon {
-        background: linear-gradient(135deg, #ff0080, #00f5ff);
+        background:
+        linear-gradient(
+            135deg,
+            #000000,
+            #071a07,
+            #101010);
     }
+    body.neon button {
+        background: linear-gradient(45deg, #39ff14, #facc15);
+        color: black;
+    }
+    
     body.retro {
-        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        background: linear-gradient(135deg, #2b1d16, #4a3427, #6e4e37);
     }
+    body.retro button {
+        background: linear-gradient(45deg, #8b5e3c, #a97155);
+    }
+}
+
+body.space button{
+    background:
+    linear-gradient(
+        45deg,
+        #2563eb,
+        #1e3a8a
+    );
+}
+
+body.neon button{
+    background:
+    linear-gradient(
+        45deg,
+        #39ff14,
+        #facc15
+    );
+
+    color:black;
+}
+
+body.retro button{
+    background:
+    linear-gradient(
+        45deg,
+        #8b5e3c,
+        #a97155
+    );
+}
+
+.container {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+}
+.left-panel {
+    width: 300px;
+}
+.right-panel {
+    flex: 1;
+}
