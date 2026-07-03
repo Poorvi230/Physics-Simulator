@@ -3,10 +3,9 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 30px;
     background: linear-gradient(135deg, #7c3aed, #2563eb, #06b6d4, #ec4899);
-    background-size: 400% 400%;
-    animation: gradient 12s ease infinite;
     font-family: Arial, sans-serif;
 }
 
@@ -41,10 +40,14 @@ body {
 h1 {
     color: white;
     font-size: 3rem;
+    margin-bottom: 10px;
+    margin-top: 0;
 }
 
 h2 {
     color: #cbd5e1;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
 p {
@@ -69,25 +72,6 @@ input[type="range"] {
     accent-color: #00f5ff;
 }
 
-button {
-    padding: 18px 36px;
-    margin-top: 20px;
-
-    border: none;
-    border-radius: 50px;
-    background: linear-gradient(45deg, #ff0080, #7928ca);
-    color: white;
-   font-size: 20px;
-   font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 0 20px rgba(255, 0, 128, 0.6);
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    transform: translateY(-5px) scale(1.08);
-    box-shadow: 0 0 30px rgba(255, 0, 128, 0.9), 0 0 50px rgba(121, 40, 202, 0.7);
-}
 
 canvas {
     background: rgba(255, 255, 255, 0.1);
@@ -95,8 +79,8 @@ canvas {
     border-radius: 20px;
     margin-top: 30px;
     box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
-    height: 320px;
-    width: 600px;
+    height: 250px;
+    width: 500px;
 }
 
     body.space {
@@ -164,4 +148,24 @@ body.retro button{
 }
 .right-panel {
     flex: 1;
+}
+
+.graph-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+#launchBtn, #resetBtn {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+#launchBtn:hover, #resetBtn:hover {
+    background:rgba(255,255,255,0.1);
 }
