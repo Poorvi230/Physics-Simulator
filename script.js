@@ -13,32 +13,36 @@ const ctx = canvas.getContext('2d');
 const btnLaunch = document.getElementById('launchBtn');
 const btnReset = document.getElementById('resetBtn');
 const selTheme = document.getElementById('themeSelect');
+const selExperiment = document.getElementById('experimentSelect');
+
+// New Environmental Controls
+const selGravity = document.getElementById('gravitySelect');
+const elDrag = document.getElementById('drag');
+const elWind = document.getElementById('wind');
+const valDrag = document.getElementById('dragValue');
+const valWind = document.getElementById('windValue');
 
 // --- Simulation State & Settings ---
 let loopId = null;
 let active = false;
-let history = []; // stores trajectory tracking array: [[x1,y1], [x2,y2]...]
+let history = []; 
+let simTime = 0;
 
-// Current position and velocity states in real world meters
 let mx = 0;
 let my = 0;
 let vx = 0;
 let vy = 0;
 
-const GRAVITY = 9.81;
-const TIMESTEP = 0.02; // seconds per calculation frame
+const TIMESTEP = 0.02; 
 
-// Dynamic display boundaries
 let scaleX = 100;
 let scaleY = 60;
 
-// Graph frame offsets inside the 500x250 canvas area
-const padLeft = 70;
-const padBottom = 200;
-const viewW = 400; 
-const viewH = 160;
+const padLeft = 60;
+const padBottom = 210;
+const viewW = 410; 
+const viewH = 170;
 
-// Color styling presets matching our CSS layout
 const themePalettes = {
     space: { line: '#38bdf8', txt: '#7dd3fc', primary: '#0ea5e9', trace: 'rgba(56, 189, 248, 0.4)' },
     neon:  { line: '#39ff14', txt: '#ccff00', primary: '#ffff00', trace: 'rgba(255, 255, 0, 0.4)' },
@@ -51,27 +55,25 @@ function adjustViewportScale() {
     const v0 = Number(elVelocity.value);
     const rad = (Number(elAngle.value) * Math.PI) / 180;
     const h0 = Number(elHeight.value);
+    const currentGravity = Number(selGravity.value);
 
     const initVx = v0 * Math.cos(rad);
     const initVy = v0 * Math.sin(rad);
 
-    // Track peak height ceiling
-    const peak = h0 + (initVy > 0 ? (initVy * initVy) / (2 * GRAVITY) : 0);
+    const gValue = currentGravity > 0 ? currentGravity : 9.81;
+    const peak = h0 + (initVy > 0 ? (initVy * initVy) / (2 * gValue) : 0);
 
-    // Calculate precise landing point to find domain length
-    const root = (initVy * initVy) + (2 * GRAVITY * h0);
+    const root = (initVy * initVy) + (2 * gValue * h0);
     let airtime = 0;
     if (root >= 0) {
-        airtime = (initVy + Math.sqrt(root)) / GRAVITY;
+        airtime = (initVy + Math.sqrt(root)) / gValue;
     }
     const distance = initVx * airtime;
 
-    // Apply 15% safety padding factor so ball stays perfectly inside bounds
-    scaleX = Math.max(distance, 10) * 1.15;
-    scaleY = Math.max(peak, 10) * 1.15;
+    scaleX = Math.max(distance, 10) * 1.25;
+    scaleY = Math.max(peak, 10) * 1.25;
 }
 
-// Projection utilities (Meters -> Screen Grid Pixels)
 function getXPixel(metersX) {
     return padLeft + (metersX / scaleX) * viewW;
 }
@@ -86,19 +88,16 @@ function drawGridSystem() {
     ctx.fillStyle = activeTheme.txt;
     ctx.lineWidth = 2;
 
-    // Vertical boundary line
     ctx.beginPath();
     ctx.moveTo(padLeft, padBottom);
     ctx.lineTo(padLeft, 30);
     ctx.stroke();
 
-    // Horizontal baseline
     ctx.beginPath();
     ctx.moveTo(padLeft, padBottom);
     ctx.lineTo(padLeft + viewW, padBottom);
     ctx.stroke();
 
-    // Horizontal increments (Range)
     ctx.font = '10px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -115,7 +114,6 @@ function drawGridSystem() {
         ctx.fillText(Math.round(metric), px, padBottom + 8);
     }
 
-    // Vertical increments (Altitudes)
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     
@@ -131,7 +129,6 @@ function drawGridSystem() {
         ctx.fillText(Math.round(metric), padLeft - 12, py);
     }
 
-    // Frame typography setup
     ctx.font = '14px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Distance (m)', padLeft + (viewW / 2), padBottom + 26);
@@ -173,6 +170,10 @@ function renderBallObject(metersX, metersY) {
 
 function refreshDisplay() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if(selTheme) {
+        activeTheme = themePalettes[selTheme.value] || themePalettes.space; 
+    }
     drawGridSystem();
     drawProjectileTrack();
     
@@ -185,11 +186,12 @@ function refreshDisplay() {
 
 // --- Mechanics Action Loop ---
 function triggerSimulation() {
-    if (active) return; // loop lock guard
+    if (active) return; 
 
     const initialVelocity = Number(elVelocity.value);
     const rad = (Number(elAngle.value) * Math.PI) / 180;
     
+    simTime = 0;
     mx = 0;
     my = Number(elHeight.value);
     vx = initialVelocity * Math.cos(rad);
@@ -197,24 +199,32 @@ function triggerSimulation() {
 
     history = [[mx, my]];
     active = true;
-
     adjustViewportScale();
 
     loopId = setInterval(() => {
-        // Simple kinematics iterations
+        simTime += TIMESTEP;
+
+        const currentGravity = Number(selGravity.value);
+        const dragCoeff = parseFloat(elDrag.value) * 0.005; 
+        const windSpeed = Number(elWind.value);
+
+        const relativeVx = vx - windSpeed;
+        const dragForceX = dragCoeff * relativeVx * Math.abs(relativeVx);
+        const dragForceY = dragCoeff * vy * Math.abs(vy);
+
+        vx -= dragForceX * TIMESTEP;
+        vy -= (currentGravity + dragForceY) * TIMESTEP;
+
         mx += vx * TIMESTEP;
         my += vy * TIMESTEP;
-        vy -= GRAVITY * TIMESTEP;
 
-        history.push([mx, my]);
-
-        // Break when tracking values clear bottom threshold line
         if (my <= 0) {
             my = 0;
             active = false;
             clearInterval(loopId);
         }
 
+        history.push([mx, my]);
         refreshDisplay();
     }, 20);
 }
@@ -223,6 +233,10 @@ function abortSimulation() {
     active = false;
     clearInterval(loopId);
     history = [];
+    simTime = 0;
+    mx = 0;
+    vy = 0;
+    my = Number(elHeight.value);
     adjustViewportScale();
     refreshDisplay();
 }
@@ -239,14 +253,30 @@ elAngle.oninput = function() {
 };
 
 elHeight.oninput = function() {
-    valHeight.textContent = this.value;
+    valHeight.textContent = this.value; 
     if (!active) { adjustViewportScale(); refreshDisplay(); }
 };
+
+elDrag.oninput = function() {
+    valDrag.textContent = this.value;
+};
+
+elWind.oninput = function() {
+    valWind.textContent = this.value;
+};
+
+selGravity.addEventListener('change', function() {
+    if (!active) { adjustViewportScale(); refreshDisplay(); }
+});
 
 selTheme.addEventListener('change', function() {
     document.body.className = this.value; 
     activeTheme = themePalettes[this.value] || themePalettes.space;
     refreshDisplay();
+});
+
+selExperiment.addEventListener('change', function() {
+    abortSimulation();
 });
 
 btnLaunch.addEventListener('click', triggerSimulation);
@@ -255,3 +285,5 @@ btnReset.addEventListener('click', abortSimulation);
 // Bootstrap setup initialization properties
 adjustViewportScale();
 refreshDisplay();
+
+console.log("Velocity Element:", elVelocity, "Canvas Element:", canvas);
