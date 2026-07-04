@@ -4,22 +4,35 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 30px;
+    padding: 30px 20px;
     background: linear-gradient(135deg, #7c3aed, #2563eb, #06b6d4, #ec4899);
     font-family: Arial, sans-serif;
+    transition: background 0.4s ease;
+    box-sizing: border-box;
 }
 
 .container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
     padding: 40px;
-    border: 4px solid #38bdf8
+    border: 4px solid #38bdf8;
     border-radius: 20px;
-    width: 850px;
+    width: 100%;
+    max-width: 850px;
     text-align: center;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     display: flex;
-    gap: 40px;
+    flex-wrap: wrap;
+    gap: 30px 40px;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.main-header {
+    width: white;
+    font-size: 2.5rem;
+    margin: 0 0 5px 0;
 }
 .left-panel {
     background: rgba(0, 0, 0, 0.25);
@@ -27,6 +40,7 @@ body {
     border-radius: 25px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 300px;
 }
 
 .right-panel {
@@ -35,137 +49,96 @@ body {
     border-radius: 25px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    flex: 1;
 }
 
 h1 {
     color: white;
-    font-size: 3rem;
-    margin-bottom: 10px;
-    margin-top: 0;
+    font-size: 2.5rem;
+    margin: 0 0 rpx 0;
 }
 
 h2 {
     color: #cbd5e1;
-    margin-top: 0;
-    margin-bottom: 15px;
+    font-size: 1.2rem;
+    margin: 0;
 }
 
 p {
     color: white;
-    font-size: 18px;
-}
-
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    font-size: 16px;
+    margin-bottom: 8px;
 }
 
 input[type="range"] {
-    width: 320px;
+    width: 100%;
     accent-color: #00f5ff;
 }
 
+#themeSelect {
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
 
 canvas {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border: 4px solid #00f5ff;
     border-radius: 20px;
-    margin-top: 30px;
-    box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
-    height: 250px;
-    width: 500px;
+    margin-top: 10px;
+    box-shadow: 0 0 25px rgba(0, 245, 255, 0.3);
+    display: block;
 }
 
-    body.space {
-        background: radial-gradient(circle at top, #1e3a8a 0%, transparent 30%), linear-gradient(135deg, #020617, #0f172a, #000000);
-    
-    }
-    body.neon {
-        background:
-        linear-gradient(
-            135deg,
-            #000000,
-            #071a07,
-            #101010);
-    }
-    body.neon button {
-        background: linear-gradient(45deg, #39ff14, #facc15);
-        color: black;
-    }
-    
-    body.retro {
-        background: linear-gradient(135deg, #2b1d16, #4a3427, #6e4e37);
-    }
-    body.retro button {
-        background: linear-gradient(45deg, #8b5e3c, #a97155);
-    }
+/* --- Theme Overrides --- */
+body.space {
+    background: radial-gradient(circle at top, #1e3a8a 0%, transparent 30%), linear-gradient(135deg, #020617, #0f172a, #000000);
+}
+body.space canvas {
+    border-color: #38bdf8;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
 }
 
-body.space button{
-    background:
-    linear-gradient(
-        45deg,
-        #2563eb,
-        #1e3a8a
-    );
+body.neon {
+    background: linear-gradient(135deg, #000000, #071a07, #101010);
+}
+body.neon canvas {
+    border-color: #39ff14;
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.3);
 }
 
-body.neon button{
-    background:
-    linear-gradient(
-        45deg,
-        #39ff14,
-        #facc15
-    );
-
-    color:black;
+body.retro {
+    background: linear-gradient(135deg, #2b1d16, #4a3427, #6e4e37);
 }
-
-body.retro button{
-    background:
-    linear-gradient(
-        45deg,
-        #8b5e3c,
-        #a97155
-    );
-}
-
-.container {
-    display: flex;
-    gap: 40px;
-    align-items: center;
-    justify-content: center;
-}
-.left-panel {
-    width: 300px;
-}
-.right-panel {
-    flex: 1;
+body.retro canvas {
+    border-color: #d2b48c;
+    box-shadow: 0 0 25px rgba(210, 180, 140, 0.3);
 }
 
 .graph-controls {
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
+/* Glass Buttons */
 #launchBtn, #resetBtn {
     background: transparent;
     color: white;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     padding: 12px 24px;
     border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
+
 #launchBtn:hover, #resetBtn:hover {
-    background:rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
 }
