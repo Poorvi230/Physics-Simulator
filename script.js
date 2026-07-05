@@ -1,11 +1,11 @@
 // --- DOM Elements ---
-const elVelocity = document.getElementById('velocity');
-const elAngle = document.getElementById('angle');
-const elHeight = document.getElementById('height');
+var elVelocity = document.getElementById('velocity');
+var elAngle = document.getElementById('angle');
+var elHeight = document.getElementById('height');
 
-const valVelocity = document.getElementById('velocityValue');
-const valAngle = document.getElementById('angleValue');
-const valHeight = document.getElementById('heightValue');
+var valVelocity = document.getElementById('velocityValue');
+var valAngle = document.getElementById('angleValue');
+var valHeight = document.getElementById('heightValue');
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -16,22 +16,27 @@ const selTheme = document.getElementById('themeSelect');
 const selExperiment = document.getElementById('experimentSelect');
 
 // New Environmental Controls
-const selGravity = document.getElementById('gravitySelect');
-const elDrag = document.getElementById('drag');
-const elWind = document.getElementById('wind');
+var selGravity = document.getElementById('gravitySelect');
+var elDrag = document.getElementById('drag');
+var elWind = document.getElementById('wind');
 const valDrag = document.getElementById('dragValue');
 const valWind = document.getElementById('windValue');
 
 // --- Simulation State & Settings ---
-let loopId = null;
-let active = false;
-let history = []; 
-let simTime = 0;
+window.loopId = null;
+window.active = false;
+window.simHistory = []; 
+window.simTime = 0;
 
-let mx = 0;
-let my = 0;
-let vx = 0;
-let vy = 0;
+window.mx = 0;
+window.my = 0;
+window.vx = 0;
+window.vy = 0;
+
+window.cxZero = 0;
+window.cyZero = 0;
+window.pxPerUnitX = 1;
+window.pxPerUnitY = 1;
 
 const TIMESTEP = 0.02; 
 
@@ -50,36 +55,16 @@ const themePalettes = {
 };
 let activeTheme = themePalettes.space;
 
-// --- Scale Computations ---
-function adjustViewportScale() {
-    const v0 = Number(elVelocity.value);
-    const rad = (Number(elAngle.value) * Math.PI) / 180;
-    const h0 = Number(elHeight.value);
-    const currentGravity = Number(selGravity.value);
-
-    const initVx = v0 * Math.cos(rad);
-    const initVy = v0 * Math.sin(rad);
-
-    const gValue = currentGravity > 0 ? currentGravity : 9.81;
-    const peak = h0 + (initVy > 0 ? (initVy * initVy) / (2 * gValue) : 0);
-
-    const root = (initVy * initVy) + (2 * gValue * h0);
-    let airtime = 0;
-    if (root >= 0) {
-        airtime = (initVy + Math.sqrt(root)) / gValue;
-    }
-    const distance = initVx * airtime;
-
-    scaleX = Math.max(distance, 10) * 1.25;
-    scaleY = Math.max(peak, 10) * 1.25;
-}
-
 function getXPixel(metersX) {
-    return padLeft + (metersX / scaleX) * viewW;
+    const scaleX = isFinite(window.pxPerUnitX) ? window.pxPerUnitX : 1;
+    
+    return window.cxZero + (metersX * scaleX);
 }
 
 function getYPixel(metersY) {
-    return padBottom - (metersY / scaleY) * viewH;
+
+    const scaleY = isFinite(window.pxPerUnitY) ? window.pxPerUnitY : 1;
+    return window.cyZero - (metersY * scaleY);
 }
 
 // --- Layout Core Renderers ---
@@ -141,19 +126,38 @@ function drawGridSystem() {
 }
 
 function drawProjectileTrack() {
-    if (history.length === 0) return;
+    if (!window.simHistory || !Array.isArray(window.simHistory) || window.simHistory.length === 0) {
+        return; 
+    }
+    ctx.save();
     ctx.beginPath();
-    ctx.strokeStyle = activeTheme.trace;
-    ctx.lineWidth = 3;
-    
-    ctx.moveTo(getXPixel(history[0][0]), getYPixel(history[0][1]));
-    for (let i = 1; i < history.length; i++) {
-        ctx.lineTo(getXPixel(history[i][0]), getYPixel(history[i][1]));
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = (typeof activeTheme !== 'undefined' && activeTheme && activeTheme.chartLine) ? activeTheme.chartLine: "#f791c4";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (let i = 0; i < window.simHistory.length; i++) {
+        const pt = window.simHistory[i];
+        if (!pt || pt.length < 2) continue; 
+
+        const cx = getXPixel(pt[0]);
+        const cy = getYPixel(pt[1]);
+
+        if (!isFinite(cx) || !isFinite(cy)) continue;
+
+        if (i === 0) ctx.moveTo(cx, cy);
+        else ctx.lineTo(cx, cy);
     }
     ctx.stroke();
+    ctx.restore();
 }
 
 function renderBallObject(metersX, metersY) {
+
+    if(!isFinite(metersX) || !isFinite(metersY)) {
+        const elHeight = document.getElementById('height');
+        metersY = elHeight ? Number(elHeight.value) : 0;
+    }
     let px = getXPixel(metersX);
     let py = getYPixel(metersY);
 
@@ -162,7 +166,9 @@ function renderBallObject(metersX, metersY) {
 
     let grad = ctx.createRadialGradient(px - 2, py - 2, 1, px, py, 8);
     grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(1, activeTheme.primary);
+    
+    const ballColor = (activeTheme && activeTheme.primary) ? activeTheme.primary : '#ff5722';
+    grad.addColorStop(1, ballColor);
     
     ctx.fillStyle = grad;
     ctx.fill();
@@ -171,91 +177,35 @@ function renderBallObject(metersX, metersY) {
 function refreshDisplay() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if(selTheme) {
+    if (selTheme) {
         activeTheme = themePalettes[selTheme.value] || themePalettes.space; 
     }
+
+    // --- Compute Grid Metrics Globally Before Drawing ---
+    window.cxZero = 60; // Left margin padding
+    window.cyZero = canvas.height - 50; // Bottom margin padding
+    
+    window.pxPerUnitX = (canvas.width - 100) / window.scaleX;
+    window.pxPerUnitY = (canvas.height - 100) / window.scaleY;
+
     drawGridSystem();
     drawProjectileTrack();
     
-    if (active) {
-        renderBallObject(mx, my);
+    if (window.active) {
+        renderBallObject(window.mx, window.my);
     } else {
-        renderBallObject(0, Number(elHeight.value));
+        // fallback in case elHeight isn't loaded yet
+        const startHeight = (typeof elHeight !== 'undefined' && elHeight) ? Number(elHeight.value) : 0;
+        if (window.simHistory && window.simHistory.length > 0) {
+            const lastIndex = window.simHistory.length - 1;
+            renderBallObject(window.simHistory[lastIndex][0], window.simHistory[lastIndex][1]);
+        } else {
+        renderBallObject(0, startHeight);
     }
+  }
 }
 
-// --- Mechanics Action Loop ---
-function triggerSimulation() {
-    if (active) return; 
-
-    const initialVelocity = Number(elVelocity.value);
-    const rad = (Number(elAngle.value) * Math.PI) / 180;
-    
-    simTime = 0;
-    mx = 0;
-    my = Number(elHeight.value);
-    vx = initialVelocity * Math.cos(rad);
-    vy = initialVelocity * Math.sin(rad);
-
-    history = [[mx, my]];
-    active = true;
-    adjustViewportScale();
-
-    loopId = setInterval(() => {
-        simTime += TIMESTEP;
-
-        const currentGravity = Number(selGravity.value);
-        const dragCoeff = parseFloat(elDrag.value) * 0.005; 
-        const windSpeed = Number(elWind.value);
-
-        const relativeVx = vx - windSpeed;
-        const dragForceX = dragCoeff * relativeVx * Math.abs(relativeVx);
-        const dragForceY = dragCoeff * vy * Math.abs(vy);
-
-        vx -= dragForceX * TIMESTEP;
-        vy -= (currentGravity + dragForceY) * TIMESTEP;
-
-        mx += vx * TIMESTEP;
-        my += vy * TIMESTEP;
-
-        if (my <= 0) {
-            my = 0;
-            active = false;
-            clearInterval(loopId);
-        }
-
-        history.push([mx, my]);
-        refreshDisplay();
-    }, 20);
-}
-
-function abortSimulation() {
-    active = false;
-    clearInterval(loopId);
-    history = [];
-    simTime = 0;
-    mx = 0;
-    vy = 0;
-    my = Number(elHeight.value);
-    adjustViewportScale();
-    refreshDisplay();
-}
-
-// --- Wire Handlers ---
-elVelocity.oninput = function() {
-    valVelocity.textContent = this.value;
-    if (!active) { adjustViewportScale(); refreshDisplay(); }
-};
-
-elAngle.oninput = function() {
-    valAngle.textContent = this.value;
-    if (!active) { adjustViewportScale(); refreshDisplay(); }
-};
-
-elHeight.oninput = function() {
-    valHeight.textContent = this.value; 
-    if (!active) { adjustViewportScale(); refreshDisplay(); }
-};
+// --- Global Wire Handlers (Environment & Framework Switchers) ---
 
 elDrag.oninput = function() {
     valDrag.textContent = this.value;
@@ -265,25 +215,67 @@ elWind.oninput = function() {
     valWind.textContent = this.value;
 };
 
-selGravity.addEventListener('change', function() {
-    if (!active) { adjustViewportScale(); refreshDisplay(); }
-});
+if (selGravity) {
+    selGravity.addEventListener('change', function() {
+        if (!active) {
+            // Safely check which mode is active to scale the graph correctly
+            if (selExperiment && selExperiment.value === 'shm') {
+                if (typeof adjustSHMScale === 'function') adjustSHMScale();
+            } else {
+                if (typeof adjustViewportScale === 'function') adjustViewportScale();
+            }
+            refreshDisplay();
+        }
+    });
+}
 
-selTheme.addEventListener('change', function() {
-    document.body.className = this.value; 
-    activeTheme = themePalettes[this.value] || themePalettes.space;
-    refreshDisplay();
-});
+if (selTheme) {
+    selTheme.addEventListener('change', function() {
+        document.body.className = this.value; 
+        activeTheme = themePalettes[this.value] || themePalettes.space;
+        refreshDisplay();
+    });
+}
 
-selExperiment.addEventListener('change', function() {
-    abortSimulation();
-});
+if (selExperiment) {
+    selExperiment.addEventListener('change', function() {
+        // Safely clear out any running simulation interval loops
+        if (typeof abortSimulation === 'function') abortSimulation();
+        if (typeof abortSHMSimulation === 'function') abortSHMSimulation();
 
-btnLaunch.addEventListener('click', triggerSimulation);
-btnReset.addEventListener('click', abortSimulation);
+        if (this.value === 'shm') {
+            projControls.style.display = 'none';
+            shmControls.style.display = 'block';
+            if (typeof adjustSHMScale === 'function') adjustSHMScale();
+        } else {
+            projControls.style.display = 'block';
+            shmControls.style.display = 'none';
+            if (typeof adjustViewportScale === 'function') adjustViewportScale();
+        }
+        refreshDisplay();
+    });
+}
 
-// Bootstrap setup initialization properties
-adjustViewportScale();
-refreshDisplay();
+// --- Bootstrap Setup Initialization ---
+// We give the browser a split second (50ms) to load projectile.js and shm.js 
+// before running the first setup render!
+setTimeout(() => {
+    // Sync UI text displays with slider values on page boot
+    if (document.getElementById('velocityValue') && document.getElementById('velocity')) {
+        document.getElementById('velocityValue').textContent = document.getElementById('velocity').value;
+    }
+    if (document.getElementById('angleValue') && document.getElementById('angle')) {
+        document.getElementById('angleValue').textContent = document.getElementById('angle').value;
+    }
+    if (document.getElementById('heightValue') && document.getElementById('height')) {
+        document.getElementById('heightValue').textContent = document.getElementById('height').value;
+    }
 
-console.log("Velocity Element:", elVelocity, "Canvas Element:", canvas);
+    if (typeof adjustViewportScale === 'function') {
+        adjustViewportScale();
+    }
+    if (typeof refreshDisplay === 'function') {
+        refreshDisplay();
+    }
+    console.log("Initialization Complete.")
+}, 100);
