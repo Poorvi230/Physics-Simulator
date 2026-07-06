@@ -15,6 +15,8 @@ if (typeof btnReset === 'undefined' || !btnReset) {
 if (typeof selExperiment === 'undefined' || !selExperiment) {
     window.selExperiment = document.getElementById('experimentSelect');
 }
+const projControls = document.getElementById('projectileControlsPanel');
+const shmControls = document.getElementById('shmControlsPanel');
 
 // --- Scale Computations ---
 function adjustViewportScale() {
@@ -46,7 +48,6 @@ function triggerSimulation() {
     if (window.active) return; 
     window.active = true;
 
-    // 1. Gather values from the DOM safely
     const initVelocity = Number(document.getElementById('velocity').value);
     const initAngle = Number(document.getElementById('angle').value);
     const initHeight = Number(document.getElementById('height').value);
@@ -54,12 +55,10 @@ function triggerSimulation() {
     const elDrag = document.getElementById('drag');
     const elWind = document.getElementById('wind');
     
-    // 2. Compute Radians and Initial Velocities
     const angleRad = (initAngle * Math.PI) / 180;
     let vx = initVelocity * Math.cos(angleRad);
     let vy = initVelocity * Math.sin(angleRad);
 
-    // 3. Clear states before kicking off
     window.simTime = 0;
     window.mx = 0;
     window.my = initHeight;
@@ -67,22 +66,18 @@ function triggerSimulation() {
 
     adjustViewportScale();
     
-    // 4. Wrap physics steps inside a repeated interval loop
     window.loopId = setInterval(() => {
         const dt = window.TIMESTEP || 0.02;
         window.simTime += dt;
 
-        // Extract environmental variables safely inside the loop
         const currentGravity = Number(selGravity ? selGravity.value : 9.8);
         const dragCoeff = parseFloat(elDrag ? elDrag.value : 0) * 0.005; 
         const windSpeed = Number(elWind ? elWind.value : 0);
 
-        // Calculate relative speed (wind affects horizontal motion)
         const relativeVx = vx - windSpeed;
         const dragForceX = dragCoeff * relativeVx * Math.abs(relativeVx);
         const dragForceY = dragCoeff * vy * Math.abs(vy);
 
-        // Update velocity vectors based on forces acting on it
         vx -= dragForceX * dt;
         vy -= (currentGravity + dragForceY) * dt;
 
@@ -93,28 +88,42 @@ function triggerSimulation() {
         if (elDistance) {
             elDistance.textContent = window.mx.toFixed(2);
         }
-        // Ground check
+// Ground check
         if (window.my <= 0) {
             window.my = 0;
             window.active = false;
             clearInterval(window.loopId);
-        }
-        // Save history and redraw frame
+
+            const resMaxHeight = document.getElementById('resMaxHeight');
+            const resFlightTime = document.getElementById('resFlightTime');
+            const resRange = document.getElementById('resRange');
+
+            if (resMaxHeight && resFlightTime && resRange) { // Fixed case-sensitivity typo here
+                let maxH = 0;
+                for (let i = 0; i < window.simHistory.length; i++) {
+                    if (window.simHistory[i][1] > maxH) {
+                        maxH = window.simHistory[i][1];
+                    }
+                }
+                resMaxHeight.textContent = maxH.toFixed(2);
+                resFlightTime.textContent = window.simTime.toFixed(2);
+                resRange.textContent = window.mx.toFixed(2);
+            }
+        } 
         window.simHistory.push([window.mx, window.my]);
         console.log("Current Array Point Saved:", [window.mx, window.my]);
         
-        refreshDisplay();
-    }, 20); // Fires cleanly every 20ms
+       refreshDisplay(); 
+    }, 20); 
 }
 
 function abortSimulation() {
     window.active = false;
-    clearInterval(window.loopId); // FIXED: Added window. context
+    clearInterval(window.loopId); 
     window.simHistory = [];
-    window.simTime = 0;           // FIXED: Added window. context
-    window.mx = 0;                // FIXED: Added window. context
-    window.my = elHeight ? Number(elHeight.value) : 0; // FIXED: Safely reset initial height position
-    
+    window.simTime = 0;           
+    window.mx = 0;               
+    window.my = elHeight ? Number(elHeight.value) : 0;
     adjustViewportScale();
     refreshDisplay();
 }
@@ -123,21 +132,21 @@ function abortSimulation() {
 if (typeof elVelocity !== 'undefined') {
     elVelocity.oninput = function() {
         if (typeof valVelocity !== 'undefined') valVelocity.textContent = this.value;
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); } // FIXED: window.active check
+        if (!window.active) { adjustViewportScale(); refreshDisplay(); }
     };
 }
 
 if (typeof elAngle !== 'undefined') {
     elAngle.oninput = function() {
         if (typeof valAngle !== 'undefined') valAngle.textContent = this.value;
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); } // FIXED: window.active check
+        if (!window.active) { adjustViewportScale(); refreshDisplay(); } 
     };
 }
 
 if (typeof elHeight !== 'undefined') {
     elHeight.oninput = function() {
         if (typeof valHeight !== 'undefined') valHeight.textContent = this.value; 
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); } // FIXED: window.active check
+        if (!window.active) { adjustViewportScale(); refreshDisplay(); } 
     };
 }
 
