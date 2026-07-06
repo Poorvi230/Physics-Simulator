@@ -8,12 +8,14 @@ function getSHMType() {
 function adjustSHMScale() {
     const selectExp = document.getElementById('experimentSelect');
     if (selectExp && selectExp.value === 'shm') {
-        window.scaleX = 10; 
+        window.scaleX = 350; 
+
         if (getSHMType() === 'spring') {
             const elAmplitude = document.getElementById('amplitude');
-            window.scaleY = elAmplitude ? Number(elAmplitude.value) * 1.5 : 10; 
+            const amp = elAmplitude ? Number(elAmplitude.value) : 4;
+            window.scaleY = (40 + amp) * 1.2;
         } else {
-            window.scaleY = 50;
+            window.scaleY = 90;
         }
     }
 }
@@ -38,7 +40,6 @@ function triggerSHMSimulation() {
         const g = 9.81;
         omega = Math.sqrt(g / L);
     }
-
     const period = (2 * Math.PI) / omega;
     const frequency = 1 / period;
     
@@ -52,12 +53,12 @@ function triggerSHMSimulation() {
 
         if (shmType === 'spring') {
             const A = Number(document.getElementById('amplitude')?.value || 4);
-            window.my = A * Math.cos(omega * window.simTime);
-            window.mx = window.simTime; 
+            window.my = 40 + (A * Math.cos(omega * window.simTime));
+            window.mx = window.simTime * 30;
         } else {
             const theta0 = Number(document.getElementById('pendulumTheta')?.value || 15) * (Math.PI / 180);
-            window.my = theta0 * Math.cos(omega * window.simTime) * (180 / Math.PI);
-            window.mx = window.simTime;
+            window.my = 40 + (theta0 * Math.cos(omega * window.simTime) * (180 / Math.PI));
+            window.mx = window.simTime * 30;
         }
 
         if (window.simTime >= maxTime) {
@@ -81,8 +82,12 @@ function drawSHMCanvasFrame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const shmType = getSHMType();
+    
+    const centerX = canvas.width / 2;
+    const topY = 40;
+
     if (getSHMType() === 'pendulum') {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         const pivotX = canvas.width / 2;
         const pivotY = 30;
         const L = Number(document.getElementById('pendulumLength')?.value || 2.5) * 35;
@@ -100,7 +105,7 @@ function drawSHMCanvasFrame() {
         const ballX = pivotX + L * Math.sin(currentAngle);
         const ballY = pivotY + L * Math.cos(currentAngle);
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(pivotX, pivotY);
@@ -130,7 +135,8 @@ function drawSHMCanvasFrame() {
 
             ctx.strokeStyle = '#00f2fe';
             ctx.fillStyle = '#00f2fe';
-            ctx.beginPath(); ctx.moveTo(ballX, ballY); ctx.lineTo(ballX - 45 * Math.sin(currentAngle), ballY - 45 * Math.cos(currentAngle)); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(ballX, ballY); ctx.lineTo(ballX - 45 * Math.sin(currentAngle), ballY - 45 * Math.cos(currentAngle)); ctx.stroke();
             ctx.fillText("T", ballX - 35 * Math.sin(currentAngle) - 10, ballY - 35 * Math.cos(currentAngle));
             
             ctx.restore();
@@ -186,9 +192,11 @@ if (typeof btnReset !== 'undefined' && btnReset) {
         }
     });
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const selExperiment = document.getElementById('experimentSelect');
-    if (selExperiment) {
-        selExperiment.dispatchEvent(new Event('change'));
-    }
-});
+const originalRefreshDisplay = window.refreshDisplay;
+window.refreshDisplay = function() {
+    if(typeof originalRefreshDisplay === 'function') {
+        originalRefreshDisplay();
+  }
+   if (typeof drawSHMCanvasFrame === 'function') {
+  }
+};

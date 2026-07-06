@@ -280,15 +280,21 @@ if (selExperiment) {
             const pendulumSub = document.getElementById('shmPendulumSubPanel');
             const shmTypeSelect = document.getElementById('shmTypeSelect');
             
-            if (shmTypeSelect) {
-                if (shmTypeSelect.value === 'pendulum') {
-                    if (springSub) springSub.style.display = 'none';
-                    if (pendulumSub) pendulumSub.style.display = 'flex';
-                } else {
-                    if (springSub) springSub.style.display = 'flex';
-                    if (pendulumSub) pendulumSub.style.display = 'none';
-                }
-            }
+
+if (typeof shmTypeSelect !== 'undefined' && shmTypeSelect) {
+    shmTypeSelect.addEventListener('change', function() {
+        const springSub = document.getElementById('shmSpringSubPanel');
+        const pendulumSub = document.getElementById('shmPendulumSubPanel');
+
+        if (this.value === 'pendulum') {
+            if (springSub) springSub.style.display = 'none';
+            if (pendulumSub) pendulumSub.style.display = 'flex';
+        } else {
+            if (springSub) springSub.style.display = 'flex';
+            if (pendulumSub) pendulumSub.style.display = 'none';
+        }
+    });
+}
         } else {
             if (projPanel) projPanel.style.display = 'flex';
             if (projRes) projRes.style.display = 'flex';
@@ -417,6 +423,83 @@ const pLen = document.getElementById('pendulumLength');
 const pMass = document.getElementById('pendulumMass');
 const pTh = document.getElementById('pendulumTheta');
 
+if (pLen) {
+    pLen.addEventListener('input', function() { 
+        const target = document.getElementById('lengthValue');
+        if (target) target.textContent = this.value; 
+    });
+}
+if (pMass) {
+    pMass.addEventListener('input', function() { 
+        const target = document.getElementById('bobMassValue');
+        if (target) target.textContent = this.value; 
+    });
+}
+if (pTh) {
+    pTh.addEventListener('input', function() { 
+        const target = document.getElementById('thetaValue');
+        if (target) target.textContent = this.value; 
+    });
+}
+//Master ui panel router engine
+if (typeof selExperiment !== 'undefined' && selExperiment) {
+    selExperiment.addEventListener('change', function() {
+        const projPanel = document.getElementById('projectileControlsPanel');
+        const shmPanel = document.getElementById('shmControlsPanel');
+        const subTitle = document.getElementById('dynamicSubtitle');
+        const projRes = document.getElementById('projectileResults');
+        const shmRes = document.getElementById('shmResults');
+
+        if (typeof abortSimulation === 'function') try { abortSimulation(); } catch(e){}
+        if (typeof abortSHMSimulation === 'function') try { abortSHMSimulation(); } catch(e){}
+
+        if (this.value === 'shm') {
+            if (projPanel) projPanel.style.display = 'none';
+            if (projRes) projRes.style.display = 'none';
+            
+            if (shmPanel) {
+                shmPanel.style.display = 'flex';
+                shmPanel.style.visibility = 'visible';
+                shmPanel.style.opacity = '1';
+            }
+            if (shmRes) shmRes.style.display = 'flex';
+            if (subTitle) subTitle.textContent = "See the SHM happen!";
+            
+            const springSub = document.getElementById('shmSpringSubPanel');
+            const pendulumSub = document.getElementById('shmPendulumSubPanel');
+            const typeSelect = document.getElementById('shmTypeSelect');
+            if (typeSelect) {
+                if (typeSelect.value === 'pendulum') {
+                    if (springSub) springSub.style.display = 'none';
+                    if (pendulumSub) pendulumSub.style.display = 'flex';
+                } else {
+                    if (springSub) springSub.style.display = 'flex';
+                    if (pendulumSub) pendulumSub.style.display = 'none';
+                }
+            }
+        } else {
+            if (projPanel) projPanel.style.display = 'flex';
+            if (projRes) projRes.style.display = 'flex';
+            if (shmPanel) shmPanel.style.display = 'none';
+            if (shmRes) shmRes.style.display = 'none';
+            if (subTitle) subTitle.textContent = "See the PHYSICS happen!";
+        }
+    });
+}
+if (typeof shmTypeSelect !== 'undefined' && shmTypeSelect) {
+    shmTypeSelect.addEventListener('change', function() {
+        const springSub = document.getElementById('shmSpringSubPanel');
+        const pendulumSub = document.getElementById('shmPendulumSubPanel');
+
+        if (this.value === 'pendulum') {
+            if (springSub) springSub.style.display = 'none';
+            if (pendulumSub) pendulumSub.style.display = 'flex';
+        } else {
+            if (springSub) springSub.style.display = 'flex';
+            if (pendulumSub) pendulumSub.style.display = 'none';
+        }
+    });
+}
 if (pLen) {
     pLen.addEventListener('input', function() { 
         const target = document.getElementById('lengthValue');
