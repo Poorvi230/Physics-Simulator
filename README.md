@@ -77,7 +77,7 @@ I also dedicated around 3 hours to making artwork which has always been a piece 
 
 | Art Concept 1 | Art Concept 2 |
 | --- | --- |
-| ![Art Concept 1](art.1.png) | ![Art Concept 2](art.2.png) |
+| ![Art Concept 1](art1.png) | ![Art Concept 2](art2.png) |
 
 ---
 
