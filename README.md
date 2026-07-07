@@ -83,6 +83,7 @@ I also dedicated around 3 hours to making artwork which has always been a piece 
 
 ## 📝 License
 This project is open-source under the [MIT License](LICENSE).
+Mess around however u like!
 
 ---
 Built with a great deal of effort. Hope you like it!
