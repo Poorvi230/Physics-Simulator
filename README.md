@@ -1,6 +1,7 @@
 # 🚀 Physics Simulator
 
-An interactive web dashboard built to take physics out of static textbooks and bring them to life. I initially just wanted to see projectile move. But as I kept working on it, it turned into a massive 20+ hour project where I ended up working around two entirely separate simulation engines: one for Projectile Motion and another for Simple Harmonic Motion (SHM).
+I built this because staring at flat, boring physics textbooks wasn't it. It started as a tiny project inspired by 11th-standard kinematics just to see a projectile actually move, but I ended up hyperfocusing and grinding for 20+ hours (mostly debugging).
+Now it’s a full dual-engine simulator that handles **Projectile Motion** and **Simple Harmonic Motion (SHM)** with real-time vector math.
 
 👉 **[Launch the Live Simulator](https://poorvi230.github.io/Physics-Simulator/)**
 
@@ -16,7 +17,7 @@ The fully optimized dashboard featuring custom environmental constants, atmosphe
 | ![Final Projectile Build](Preview7.png) | ![Final Pendulum FBD Engine](Preview6.png) |
 
 ### How It Started vs. How It Went
-A look through the development phases, from basic canvas plots to managing frequency waves and custom UI themes. 
+Tthe development phases- from basic canvas plots to managing frequency waves and custom UI themes. 
 
 | Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme | Phase 3: SHM Wave Testing |
 | --- | --- | --- |
@@ -32,14 +33,14 @@ A look through the development phases, from basic canvas plots to managing frequ
 ## 🎨 Core Features
 
 * **🏹 Track A: Projectile Motion Engine**
-  * Live configuration sliders for Velocity, Launch Angle, and Initial Height.
-  * Environmental variables including Gravity presets (Earth, Moon, Space), Air Resistance, and Crosswinds.
-  * Real-time telemetry readouts tracking Max Height, Total Flight Time, and Horizontal Range.
+  * Sliders to tweak Velocity, Launch Angle, and Initial Height on the fly.
+  * Environmental variables like Gravity presets (Earth, Moon, Space), Air Resistance, and Crosswinds.
+  * Live stats tracking Max Height, Total Flight Time, and Horizontal Range.
 
 * **🌀 Track B: Simple Harmonic Motion (SHM) Engine**
-  * **Linear Mode:** It generates a clean, isolated Displacement vs. Time sine wave graph tracking boundaries from $-A \to +A$.
+  * **Linear Mode:** Generates a clean, isolated Displacement vs. Time sine wave graph tracking boundaries from $-A \to +A$.
   * **Angular Mode:** Simulates a mathematically precise swinging pendulum anchored to a top-center pivot point.
-  * **Free Body Diagram (FBD) Overlay:** A real-time toggle drawing dynamic, color-coded force vectors directly from the center of the moving bob: **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
+  * **Free Body Diagram (FBD) Overlay:** A toggle that draws live, color-coded force vectors directly from the center of the moving bob showing **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
 
 ---
 
@@ -58,11 +59,25 @@ The pendulum engine calculates true physical states frame-by-frame ($\Delta t = 
 
 ---
 
-## 🔮 Future Work
+## Inspiration
+- 11th Grade Physics Textbook
+  
+---
+
+## Future Work
 
 Future development plans include:
-* Expanding the dashboard to include a wider variety of physics experiments (such as wave optics or circular motion mechanics).
-* Refining and upgrading the UI/UX layout to provide an even smoother, more accessible user experience.
+* Expanding the dashboard to include a wider variety of experiments (like wave optics or circular motion mechanics).
+* Upgrading the UI/UX layout to for more smoother and interactive experience.
+
+---
+
+### 🎨 Creative Corner
+I also dedicated around 3 hours to making artwork which has always been a piece of me, you'll be seeing more in projects ahead!
+
+| Art Concept 1 | Art Concept 2 |
+| --- | --- |
+| ![Art Concept 1](art.1.png) | ![Art Concept 2](art.2.png) |
 
 ---
 
