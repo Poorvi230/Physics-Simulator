@@ -21,7 +21,7 @@ Tthe development phases- from basic canvas plots to managing frequency waves and
 
 | Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme | Phase 3: SHM Wave Testing |
 | --- | --- | --- |
-| ![Initial Plotting](Preview3.png) | ![Neon Theme Trial](Preview1.png) | ![SHM Frequency Plots](Preview5.jpg) |
+| ![Initial Plotting](Preview3.png) | ![Neon Theme Trial](Preview1.png) | ![SHM Frequency Plots](Preview5.png) |
 
 > ⚠️ **Debugging Note on Phase 3:** This phase was where the code went completely bonkers. Most of the development time was spent right here trying to debug the canvas rendering engine because it kept overlaying the old projectile coordinate lines underneath the active spring harmonic waves.
 
@@ -77,7 +77,7 @@ I also dedicated around 3 hours to making artwork which has always been a piece 
 
 | Art Concept 1 | Art Concept 2 |
 | --- | --- |
-| ![Art Concept 1](art1.png) | ![Art Concept 2](art2.png) |
+| ![Art Concept 1](art1.jpeg) | ![Art Concept 2](art2.jpeg) |
 
 ---
 
