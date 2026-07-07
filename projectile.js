@@ -6,18 +6,6 @@ var selGravity = document.getElementById('gravitySelect');
 var elDrag = document.getElementById('drag');
 var elWind = document.getElementById('wind');
 
-if (typeof btnLaunch === 'undefined' || !btnLaunch) {
-    window.btnLaunch = document.getElementById('launchBtn');
-}
-if (typeof btnReset === 'undefined' || !btnReset) {
-    window.btnReset = document.getElementById('resetBtn');
-}
-if (typeof selExperiment === 'undefined' || !selExperiment) {
-    window.selExperiment = document.getElementById('experimentSelect');
-}
-const projControls = document.getElementById('projectileControlsPanel');
-const shmControls = document.getElementById('shmControlsPanel');
-
 // --- Scale Computations ---
 function adjustViewportScale() {
     const v0 = Number(elVelocity.value);
@@ -42,7 +30,6 @@ function adjustViewportScale() {
     scaleY = Math.max(peak, 10) * 1.25;
 }
 
-// --- Mechanics Action Loop ---
 // --- Mechanics Action Loop ---
 function triggerSimulation() {
     if (window.active) return; 
@@ -98,7 +85,7 @@ function triggerSimulation() {
             const resFlightTime = document.getElementById('resFlightTime');
             const resRange = document.getElementById('resRange');
 
-            if (resMaxHeight && resFlightTime && resRange) { // Fixed case-sensitivity typo here
+            if (resMaxHeight && resFlightTime && resRange) {
                 let maxH = 0;
                 for (let i = 0; i < window.simHistory.length; i++) {
                     if (window.simHistory[i][1] > maxH) {
@@ -111,7 +98,6 @@ function triggerSimulation() {
             }
         } 
         window.simHistory.push([window.mx, window.my]);
-        console.log("Current Array Point Saved:", [window.mx, window.my]);
         
        refreshDisplay(); 
     }, 20); 
@@ -126,28 +112,6 @@ function abortSimulation() {
     window.my = elHeight ? Number(elHeight.value) : 0;
     adjustViewportScale();
     refreshDisplay();
-}
-
-// --- Projectile Handlers ---
-if (typeof elVelocity !== 'undefined') {
-    elVelocity.oninput = function() {
-        if (typeof valVelocity !== 'undefined') valVelocity.textContent = this.value;
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); }
-    };
-}
-
-if (typeof elAngle !== 'undefined') {
-    elAngle.oninput = function() {
-        if (typeof valAngle !== 'undefined') valAngle.textContent = this.value;
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); } 
-    };
-}
-
-if (typeof elHeight !== 'undefined') {
-    elHeight.oninput = function() {
-        if (typeof valHeight !== 'undefined') valHeight.textContent = this.value; 
-        if (!window.active) { adjustViewportScale(); refreshDisplay(); } 
-    };
 }
 
 // --- Projectile Button Event Listeners ---

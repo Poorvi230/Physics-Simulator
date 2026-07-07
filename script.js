@@ -10,22 +10,6 @@ var valHeight = document.getElementById('heightValue');
 const canvas = document.getElementById('canvas') || document.getElementById('simCanvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 
-if (elVelocity) {
-    elVelocity.addEventListener('input', function() {
-        if (valVelocity) valVelocity.textContent = this.value;
-    });
-}
-if (elAngle) {
-    elAngle.addEventListener('input', function() {
-        if (valAngle) valAngle.textContent = this.value;
-    });
-}
-if (elHeight) {
-    elHeight.addEventListener('input', function() {
-        if (valHeight) valHeight.textContent = this.value;
-    });
-}
-
 const btnLaunch = document.getElementById('launchBtn');
 const btnReset = document.getElementById('resetBtn');
 const selTheme = document.getElementById('themeSelect');
@@ -41,6 +25,7 @@ const valWind = document.getElementById('windValue');
 // --- Simulation State & Settings ---
 window.loopId = null;
 window.active = false;
+window.shmType = 'linear';
 window.simHistory = []; 
 window.simTime = 0;
 
@@ -59,10 +44,10 @@ const TIMESTEP = 0.02;
 let scaleX = 100;
 let scaleY = 60;
 
-const padLeft = 60;
-const padBottom = 210;
-const viewW = 410; 
-const viewH = 170;
+const padLeft = 70;
+const padBottom = 360;
+const viewW = 600; 
+const viewH = 280;
 
 const themePalettes = {
     space: { line: '#38bdf8', txt: '#7dd3fc', primary: '#0ea5e9', trace: 'rgba(56, 189, 248, 0.4)' },
@@ -73,18 +58,17 @@ let activeTheme = themePalettes.space;
 
 function getXPixel(metersX) {
     const scaleX = isFinite(window.pxPerUnitX) ? window.pxPerUnitX : 1;
-    
     return window.cxZero + (metersX * scaleX);
 }
 
 function getYPixel(metersY) {
-
     const scaleY = isFinite(window.pxPerUnitY) ? window.pxPerUnitY : 1;
     return window.cyZero - (metersY * scaleY);
 }
 
 // --- Layout Core Renderers ---
 function drawGridSystem() {
+    if (!ctx) return;
     ctx.strokeStyle = activeTheme.line;
     ctx.fillStyle = activeTheme.txt;
     ctx.lineWidth = 2;
@@ -142,7 +126,7 @@ function drawGridSystem() {
 }
 
 function drawProjectileTrack() {
-    if (!window.simHistory || !Array.isArray(window.simHistory) || window.simHistory.length === 0) {
+    if (!ctx || !window.simHistory || !Array.isArray(window.simHistory) || window.simHistory.length === 0) {
         return; 
     }
     ctx.save();
@@ -169,7 +153,7 @@ function drawProjectileTrack() {
 }
 
 function renderBallObject(metersX, metersY) {
-
+    if (!ctx) return;
     if(!isFinite(metersX) || !isFinite(metersY)) {
         const elHeight = document.getElementById('height');
         metersY = elHeight ? Number(elHeight.value) : 0;
@@ -191,50 +175,62 @@ function renderBallObject(metersX, metersY) {
 }
 
 function refreshDisplay() {
+    if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (selTheme) {
         activeTheme = themePalettes[selTheme.value] || themePalettes.space; 
     }
 
-    // --- Compute Grid Metrics Globally Before Drawing ---
-    window.cxZero = 60; // Left margin padding
-    window.cyZero = canvas.height - 50; // Bottom margin padding
-    
+    const isSHM = (selExperiment && selExperiment.value === 'shm');
+    const isPendulum = (isSHM && window.shmType === 'pendulum');
+
+    canvas.classList.toggle('canvas-pendulum-mode', isPendulum);
+
+    window.cxZero = padLeft;
+    window.cyZero = padBottom;
+    window.scaleX = window.scaleX || 350;
+    window.scaleY = window.scaleY || 90;
     window.pxPerUnitX = (canvas.width - 100) / window.scaleX;
     window.pxPerUnitY = (canvas.height - 100) / window.scaleY;
 
-    drawGridSystem();
-    drawProjectileTrack();
-    
-    if (window.active) {
-        renderBallObject(window.mx, window.my);
-    } else {
-        // fallback in case elHeight isn't loaded yet
-        const startHeight = (typeof elHeight !== 'undefined' && elHeight) ? Number(elHeight.value) : 0;
-        if (window.simHistory && window.simHistory.length > 0) {
-            const lastIndex = window.simHistory.length - 1;
-            renderBallObject(window.simHistory[lastIndex][0], window.simHistory[lastIndex][1]);
+    if (!isSHM) {
+        if (typeof drawGridSystem === 'function') drawGridSystem();
+        if (typeof drawProjectileTrack === 'function') drawProjectileTrack();
+        
+        if (window.active) {
+            renderBallObject(window.mx, window.my);
         } else {
-        renderBallObject(0, startHeight);
+            const startHeight = (typeof elHeight !== 'undefined' && elHeight) ? Number(elHeight.value) : 0;
+            if (window.simHistory && window.simHistory.length > 0) {
+                const lastIndex = window.simHistory.length - 1;
+                renderBallObject(window.simHistory[lastIndex][0], window.simHistory[lastIndex][1]);
+            } else {
+                renderBallObject(0, startHeight);
+            }
+        }
+    } else {
+        if (typeof window.drawSHMCanvasFrame === 'function') {
+            window.drawSHMCanvasFrame();
+        }
     }
-  }
+} 
+
+// --- Input Readout Event Listeners ---
+if (elDrag && valDrag) {
+    elDrag.addEventListener('input', function() {
+        valDrag.textContent = parseFloat(this.value).toFixed(1);
+    });
 }
-
-// --- Global Wire Handlers (Environment & Framework Switchers) ---
-
-elDrag.oninput = function() {
-    valDrag.textContent = this.value;
-};
-
-elWind.oninput = function() {
-    valWind.textContent = this.value;
-};
+if (elWind && valWind) {
+    elWind.addEventListener('input', function() { 
+        valWind.textContent = this.value; 
+    });
+}
 
 if (selGravity) {
     selGravity.addEventListener('change', function() {
-        if (!active) {
-            // Safely check which mode is active to scale the graph correctly
+        if (!window.active) {
             if (selExperiment && selExperiment.value === 'shm') {
                 if (typeof adjustSHMScale === 'function') adjustSHMScale();
             } else {
@@ -253,69 +249,176 @@ if (selTheme) {
     });
 }
 
-if (selExperiment) {
-    selExperiment.addEventListener('change', function() {
-        const projPanel = document.getElementById('projectileControlsPanel');
-        const shmPanel = document.getElementById('shmControlsPanel');
-        const subTitle = document.getElementById('dynamicSubtitle');
-        const projRes = document.getElementById('projectileResults');
-        const shmRes = document.getElementById('shmResults');
+function syncSliderDisplay(sliderId, valueId) {
+    const slider = document.getElementById(sliderId);
+    const display = document.getElementById(valueId);
+    if (slider && display) {
+        display.textContent = slider.value;
+    }
+}
 
-        if (typeof abortSimulation === 'function') try { abortSimulation(); } catch(e){}
-        if (typeof abortSHMSimulation === 'function') try { abortSHMSimulation(); } catch(e){}
+function bindSliderValue(sliderId, valueId, formatter) {
+    const slider = document.getElementById(sliderId);
+    const target = document.getElementById(valueId);
 
-        if (this.value === 'shm') {
-            if (projPanel) projPanel.style.display = 'none';
-            if (projRes) projRes.style.display = 'none';
-            
-            if (shmPanel) {
-                shmPanel.style.display = 'flex';
-                shmPanel.style.visibility = 'visible';
-                shmPanel.style.opacity = '1';
+    if (!slider || !target) return;
+
+    slider.addEventListener('input', function() {
+        const value = typeof formatter === 'function' ? formatter(this.value) : this.value;
+        target.textContent = value;
+        if (!window.active) {
+            if (typeof refreshDisplay === 'function') {
+                refreshDisplay();
             }
-            if (shmRes) shmRes.style.display = 'flex';
-            if (subTitle) subTitle.textContent = "See the SHM happen!";
-            
-            const springSub = document.getElementById('shmSpringSubPanel');
-            const pendulumSub = document.getElementById('shmPendulumSubPanel');
-            const shmTypeSelect = document.getElementById('shmTypeSelect');
-            
-
-if (typeof shmTypeSelect !== 'undefined' && shmTypeSelect) {
-    shmTypeSelect.addEventListener('change', function() {
-        const springSub = document.getElementById('shmSpringSubPanel');
-        const pendulumSub = document.getElementById('shmPendulumSubPanel');
-
-        if (this.value === 'pendulum') {
-            if (springSub) springSub.style.display = 'none';
-            if (pendulumSub) pendulumSub.style.display = 'flex';
-        } else {
-            if (springSub) springSub.style.display = 'flex';
-            if (pendulumSub) pendulumSub.style.display = 'none';
-        }
-    });
-}
-        } else {
-            if (projPanel) projPanel.style.display = 'flex';
-            if (projRes) projRes.style.display = 'flex';
-            if (shmPanel) shmPanel.style.display = 'none';
-            if (shmRes) shmRes.style.display = 'none';
-            if (subTitle) subTitle.textContent = "See the PHYSICS happen!";
         }
     });
 }
 
-// --- Bootstrap Setup Initialization ---
-setTimeout(() => {
-    if (document.getElementById('velocityValue') && document.getElementById('velocity')) {
-        document.getElementById('velocityValue').textContent = document.getElementById('velocity').value;
+// --- Page Router ---
+function setExperimentView(experimentValue) {
+    const isSHM = experimentValue === 'shm';
+    const projPage = document.getElementById('projectilePage');
+    const shmPage = document.getElementById('shmPage');
+    const projRes = document.getElementById('projectileResults');
+    const shmRes = document.getElementById('shmResults');
+    const subTitle = document.getElementById('dynamicSubtitle');
+
+    if (typeof abortSimulation === 'function') {
+        try { abortSimulation(); } catch (error) {}
     }
-    if (document.getElementById('angleValue') && document.getElementById('angle')) {
-        document.getElementById('angleValue').textContent = document.getElementById('angle').value;
+    if (typeof abortSHMSimulation === 'function') {
+        try { abortSHMSimulation(); } catch (error) {}
     }
-    if (document.getElementById('heightValue') && document.getElementById('height')) {
-        document.getElementById('heightValue').textContent = document.getElementById('height').value;
+
+    if (projPage) projPage.classList.toggle('hidden-page', isSHM);
+    if (shmPage) shmPage.classList.toggle('hidden-page', !isSHM);
+    if (projRes) projRes.classList.toggle('hidden-panel', isSHM);
+    if (shmRes) shmRes.classList.toggle('hidden-panel', !isSHM);
+    if (subTitle) {
+        subTitle.textContent = isSHM ? 'Simple Harmonic Motion Simulator' : 'Projectile Motion Simulator';
     }
+
+    if (isSHM) {
+        // Show picker, hide both sub-panels
+        hideAllSHMContent();
+        const picker = document.getElementById('shmPicker');
+        if (picker) picker.classList.remove('hidden-page');
+        if (typeof adjustSHMScale === 'function') adjustSHMScale();
+    } else {
+        if (typeof adjustViewportScale === 'function') adjustViewportScale();
+    }
+
+    if (typeof refreshDisplay === 'function') {
+        refreshDisplay();
+    }
+}
+
+function hideAllSHMContent() {
+    const picker = document.getElementById('shmPicker');
+    const linear = document.getElementById('linearSHMContent');
+    const pendulum = document.getElementById('pendulumSHMContent');
+    if (picker) picker.classList.add('hidden-page');
+    if (linear) linear.classList.add('hidden-page');
+    if (pendulum) pendulum.classList.add('hidden-page');
+}
+
+function selectSHMType(type) {
+    window.shmType = type;
+    hideAllSHMContent();
+    const content = document.getElementById(type === 'linear' ? 'linearSHMContent' : 'pendulumSHMContent');
+    if (content) content.classList.remove('hidden-page');
+
+    if (typeof abortSHMSimulation === 'function') {
+        try { abortSHMSimulation(); } catch (error) {}
+    }
+
+    if (typeof adjustSHMScale === 'function') adjustSHMScale();
+    if (typeof refreshDisplay === 'function') refreshDisplay();
+}
+
+function handleFBDToggle() {
+    if (typeof refreshDisplay === 'function') {
+        refreshDisplay();
+    }
+}
+
+// --- Unified Initialization ---
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Projectile slider readouts ---
+    const bindProjSlider = (sliderEl, valEl) => {
+        if (sliderEl && valEl) {
+            sliderEl.addEventListener('input', function() {
+                valEl.textContent = this.value;
+                if (!window.active) {
+                    if (typeof adjustViewportScale === 'function') adjustViewportScale();
+                    if (typeof refreshDisplay === 'function') refreshDisplay();
+                }
+            });
+        }
+    };
+    bindProjSlider(elVelocity, valVelocity);
+    bindProjSlider(elAngle, valAngle);
+    bindProjSlider(elHeight, valHeight);
+
+    // --- SHM spring slider readouts ---
+    const bindSpringSlider = (id, valId) => {
+        const input = document.getElementById(id);
+        const display = document.getElementById(valId);
+        if (input && display) {
+            input.addEventListener('input', function() {
+                display.textContent = this.value;
+                if (!window.active) {
+                    if (typeof adjustSHMScale === 'function') adjustSHMScale();
+                    if (typeof refreshDisplay === 'function') refreshDisplay();
+                }
+            });
+        }
+    };
+    bindSpringSlider('springK', 'springKValue');
+    bindSpringSlider('mass', 'massValue');
+    bindSpringSlider('amplitude', 'amplitudeValue');
+
+    // --- Pendulum slider readouts ---
+    bindSliderValue('pendulumLength', 'lengthValue', value => parseFloat(value).toFixed(1));
+    bindSliderValue('pendulumMass', 'bobMassValue', value => parseFloat(value).toFixed(1));
+    bindSliderValue('pendulumTheta', 'thetaValue', value => parseInt(value, 10));
+
+    // --- FBD checkbox ---
+    const showFBD = document.getElementById('showFBD');
+    if (showFBD) {
+        showFBD.addEventListener('change', handleFBDToggle);
+    }
+
+    // --- Experiment selector: unified listener ---
+    if (selExperiment) {
+        selExperiment.addEventListener('change', function() {
+            setExperimentView(this.value);
+        });
+    }
+
+    // --- SHM Picker Buttons ---
+    const pickLinear = document.getElementById('pickLinearSHM');
+    const pickPendulum = document.getElementById('pickPendulumSHM');
+    if (pickLinear) pickLinear.addEventListener('click', () => selectSHMType('linear'));
+    if (pickPendulum) pickPendulum.addEventListener('click', () => selectSHMType('pendulum'));
+
+    // --- SHM Start Buttons ---
+    const bindSHMBtn = (btnId) => {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.addEventListener('click', () => {
+            if (typeof triggerSHMSimulation === 'function') triggerSHMSimulation();
+        });
+    };
+    bindSHMBtn('startSHMBtn');
+    bindSHMBtn('startPendulumBtn');
+
+    // --- Initialize Display ---
+    setExperimentView(selExperiment ? selExperiment.value : 'projectile');
+
+    // Ensure initial readout values match sliders
+    syncSliderDisplay('velocity', 'velocityValue');
+    syncSliderDisplay('angle', 'angleValue');
+    syncSliderDisplay('height', 'heightValue');
 
     if (typeof adjustViewportScale === 'function') {
         adjustViewportScale();
@@ -323,198 +426,5 @@ setTimeout(() => {
     if (typeof refreshDisplay === 'function') {
         refreshDisplay();
     }
-    console.log("Initialization Complete.")
-}, 100);
-
-const expSelect = document.getElementById('experimentSelect');
-const projPanel = document.getElementById('projectileControlsPanel');
-const shmPanel = document.getElementById('shmControlsPanel');
-const subTitle = document.getElementById('dynamicSubtitle');
-
-if (expSelect) {
-    expSelect.addEventListener('change', function() {
-        if (typeof abortSimulation === 'function') abortSimulation();
-        if (typeof abortSHMSimulation === 'function') abortSHMSimulation();
-
-        if (this.value === 'shm') {
-            if (projPanel) projPanel.style.setProperty('display', 'none', 'important');
-            if (shmPanel) shmPanel.style.setProperty('display', 'flex', 'important');
-            if (subTitle) subTitle.textContent = "Simple Harmonic Motion Simulator";
-
-            if (typeof adjustSHMScale === 'function') adjustSHMScale();
-        } else {
-            if (projPanel) projPanel.style.setProperty('display', 'flex', 'important');
-            if (shmPanel) shmPanel.style.setProperty('display', 'none', 'important');
-            if (subTitle) subTitle.textContent = "Projectile Motion Simulator";
-
-            if (typeof adjustViewportScale === 'function') adjustViewportScale();
-        }
-
-        if (typeof draw === 'function') draw();
-    });
-}
- if (selTheme) {
-    selTheme.addEventListener('change', function() {
-        document.body.className = this.value;
-    });
- }
-if (elDrag && valDrag) {
-    elDrag.addEventListener('input', function() {
-        valDrag.textContent = parseFloat(this.value).toFixed(1);
-    });
-}
- {
-    selExperiment.addEventListener('change', function() {
-        const projPanel = document.getElementById('projectileControlsPanel');
-        const shmPanel = document.getElementById('shmControlsPanel');
-        const subTitle = document.getElementById('dynamicSubtitle');
-        const projRes = document.getElementById('projectileResults');
-        const shmRes = document.getElementById('shmResults');
-    
-        if (typeof abortSimulation === 'function') abortSimulation();
-        if (typeof abortSHMSimulation === 'function') abortSHMSimulation();
-
-        if (this.value === 'shm') {
-            if (projPanel) projPanel.style.setProperty('display', 'none', 'important');
-            if (shmPanel) shmPanel.style.setProperty('display', 'none', 'important');
-            if (projRes) projRes.style.setProperty('display', 'none', 'important');
-            if (shmRes) shmRes.style.setProperty('display', 'flex', 'important');
-            if (subTitle) subTitle.textContent = "Simple Harmonic Motion Simulator";
-
-            if (typeof adjustSHMScale === 'function') adjustSHMScale();
-        } else {
-            if (projPanel) projPanel.style.setProperty('display', 'flex', 'important');
-            if (shmPanel) shmPanel.style.setProperty('display', 'none', 'important');
-            if (projRes) projRes.style.setProperty('display', 'flex', 'important');
-            if (shmRes) shmRes.style.setProperty('display', 'none', 'important');
-            if (subTitle) subTitle.textContent = "Projectile Motion Simulator";
-        
-        if (typeof adjustViewportScale === 'function') adjustViewportScale();
-        }
-        if (typeof refreshDisplay === 'function') refreshDisplay();
-    });
-}
-//SHM Category Controller
-const shmTypeSelect = document.getElementById('shmTypeSelect');
-if (shmTypeSelect) {
-    shmTypeSelect.addEventListener('change', function() {
-        const springSub = document.getElementById('shmSpringSubPanel');
-        const pendulumSub = document.getElementById('shmPendulumSubPanel');
-
-        if (typeof abortSHMSimulation === 'function') abortSHMSimulation();
-
-        if (this.value === 'pendulum') {
-            if (springSub) springSub.classList.add('hidden-panel');
-            if (pendulumSub) {
-                pendulumSub.classList.add('hidden-panel');
-                pendulumSub.style.display = 'flex'; 
-            }
-        } else {
-            if (springSub) {
-                springSub.classList.remove('hidden-panel');
-                springSub.style.display = 'flex';
-            }
-            if (pendulumSub) pendulumSub.classList.add('hidden-panel');
-        }
-    });
-}
-// --- Pendulum Slider Live Value Connectors ---
-const pLen = document.getElementById('pendulumLength');
-const pMass = document.getElementById('pendulumMass');
-const pTh = document.getElementById('pendulumTheta');
-
-if (pLen) {
-    pLen.addEventListener('input', function() { 
-        const target = document.getElementById('lengthValue');
-        if (target) target.textContent = this.value; 
-    });
-}
-if (pMass) {
-    pMass.addEventListener('input', function() { 
-        const target = document.getElementById('bobMassValue');
-        if (target) target.textContent = this.value; 
-    });
-}
-if (pTh) {
-    pTh.addEventListener('input', function() { 
-        const target = document.getElementById('thetaValue');
-        if (target) target.textContent = this.value; 
-    });
-}
-//Master ui panel router engine
-if (typeof selExperiment !== 'undefined' && selExperiment) {
-    selExperiment.addEventListener('change', function() {
-        const projPanel = document.getElementById('projectileControlsPanel');
-        const shmPanel = document.getElementById('shmControlsPanel');
-        const subTitle = document.getElementById('dynamicSubtitle');
-        const projRes = document.getElementById('projectileResults');
-        const shmRes = document.getElementById('shmResults');
-
-        if (typeof abortSimulation === 'function') try { abortSimulation(); } catch(e){}
-        if (typeof abortSHMSimulation === 'function') try { abortSHMSimulation(); } catch(e){}
-
-        if (this.value === 'shm') {
-            if (projPanel) projPanel.style.display = 'none';
-            if (projRes) projRes.style.display = 'none';
-            
-            if (shmPanel) {
-                shmPanel.style.display = 'flex';
-                shmPanel.style.visibility = 'visible';
-                shmPanel.style.opacity = '1';
-            }
-            if (shmRes) shmRes.style.display = 'flex';
-            if (subTitle) subTitle.textContent = "See the SHM happen!";
-            
-            const springSub = document.getElementById('shmSpringSubPanel');
-            const pendulumSub = document.getElementById('shmPendulumSubPanel');
-            const typeSelect = document.getElementById('shmTypeSelect');
-            if (typeSelect) {
-                if (typeSelect.value === 'pendulum') {
-                    if (springSub) springSub.style.display = 'none';
-                    if (pendulumSub) pendulumSub.style.display = 'flex';
-                } else {
-                    if (springSub) springSub.style.display = 'flex';
-                    if (pendulumSub) pendulumSub.style.display = 'none';
-                }
-            }
-        } else {
-            if (projPanel) projPanel.style.display = 'flex';
-            if (projRes) projRes.style.display = 'flex';
-            if (shmPanel) shmPanel.style.display = 'none';
-            if (shmRes) shmRes.style.display = 'none';
-            if (subTitle) subTitle.textContent = "See the PHYSICS happen!";
-        }
-    });
-}
-if (typeof shmTypeSelect !== 'undefined' && shmTypeSelect) {
-    shmTypeSelect.addEventListener('change', function() {
-        const springSub = document.getElementById('shmSpringSubPanel');
-        const pendulumSub = document.getElementById('shmPendulumSubPanel');
-
-        if (this.value === 'pendulum') {
-            if (springSub) springSub.style.display = 'none';
-            if (pendulumSub) pendulumSub.style.display = 'flex';
-        } else {
-            if (springSub) springSub.style.display = 'flex';
-            if (pendulumSub) pendulumSub.style.display = 'none';
-        }
-    });
-}
-if (pLen) {
-    pLen.addEventListener('input', function() { 
-        const target = document.getElementById('lengthValue');
-        if (target) target.textContent = this.value; 
-    });
-}
-if (pMass) {
-    pMass.addEventListener('input', function() { 
-        const target = document.getElementById('bobMassValue');
-        if (target) target.textContent = this.value; 
-    });
-}
-if (pTh) {
-    pTh.addEventListener('input', function() { 
-        const target = document.getElementById('thetaValue');
-        if (target) target.textContent = this.value; 
-    });
-}
+    console.log('Initialization Complete.');
+});

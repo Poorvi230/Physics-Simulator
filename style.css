@@ -224,3 +224,207 @@ body.retro canvas {
 .hidden-panel {
     display: none !important;
 }
+
+.canvas-pendulum-mode {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.flex-subpanel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* --- Page Swapper --- */
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.hidden-page {
+    display: none !important;
+}
+
+/* --- Sim Layout --- */
+.sim-layout {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    width: 100%;
+}
+.controls-column {
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+.canvas-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    box-sizing: border-box;
+}
+.canvas-box {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* --- Control Card --- */
+.control-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+.control-group {
+    margin-bottom: 0;
+}
+.control-group p {
+    margin-bottom: 6px;
+}
+.control-card input[type="range"],
+.control-card select {
+    width: 100%;
+}
+.control-card button {
+    width: 100%;
+    padding: 10px;
+    font-weight: bold;
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.control-card button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- Env Card --- */
+.env-card {
+    padding: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* --- SHM Picker --- */
+.shm-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.shm-picker p {
+    font-size: 1.1rem;
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+.shm-pick-btn {
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.06);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.shm-pick-btn:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.5);
+}
+
+/* --- Results Bar --- */
+.results-bar {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 20px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.results-bar h3 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    text-align: center;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+.results-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+.metric-box {
+    text-align: center;
+}
+.metric-label {
+    opacity: 0.6;
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 3px;
+}
+.metric-box span:last-child {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #63b3ed;
+}
+
+/* --- Container tweaks --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
+}
+.main-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.selector-group {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#resetBtn {
+    padding: 8px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 16px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+#resetBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
