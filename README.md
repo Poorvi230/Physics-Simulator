@@ -2,16 +2,20 @@
 
 I built this because staring at flat, boring physics textbooks wasn't it. It started as a tiny project inspired by my 11th-standard physics class just to see a projectile actually move, but I ended up hyperfocusing and grinding for like 20+ hours on this. Now it’s a full dual-engine simulator that handles **Projectile Motion** and **Simple Harmonic Motion (SHM)** with real-time vector math.
 
-👉 **[CHeck this out!](https://poorvi230.github.io/Physics-Simulator/)**
+👉 **[Experiment](https://poorvi230.github.io/Physics-Simulator/)**
 
 ---
 
 ### Final Look
 This is what the simulator looks like now— its fully loaded with custom gravity presets, air resistance, crosswinds, different themes, and full Free Body Diagram vector overlays.
 
-| Final Projectile Tracker | Pendulum FBD Engine (Live Vector Arrows) |
-| --- | --- |
-| ![Final Projectile Build](Preview7.png) | ![Final Pendulum FBD Engine](Preview6.png) |
+| Final Projectile Tracker |
+| --- |
+| ![Final Projectile Build](Preview7.png) |
+
+| Pendulum FBD Engine (With Vector Arrows) |
+| --- |
+| ![Final Pendulum FBD Engine](Preview6.png) |
 
 ### How It Started
 I definitely didn't get it right on the first try. I started out with basic canvas plots before messing around with custom themes.
@@ -38,9 +42,10 @@ Most of my development time was spent right here trying to debug the canvas rend
   * It shows you live stats for max height, flight time, and the total horizontal range.
 
 * Track B: Simple Harmonic Motion (SHM) Engine
-  * **Linear Mode:** Draws a clean, isolated Displacement vs. Time sine wave graph from $-A \to +A$.
-  * **Angular Mode:** A mathematically exact swinging pendulum anchored to a top-center pivot point.
-  * **Free Body Diagram (FBD) Overlay:** A toggle that draws live, color-coded force vectors right on the moving bob showing **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
+  * **Linear Mode:** It draws a clean, isolated Displacement vs. Time sine wave graph from $-A \to +A$.
+  * **Angular Mode:** A pendulum which also shows a free body diagram.
+  * **Free Body Diagram (FBD) Overlay:** It draws live, color-coded force vectors right on the moving bob showing -
+    - **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
 
 ---
 
@@ -58,6 +63,11 @@ The pendulum calculates real physics frame-by-frame ($\Delta t = 0.016\text{s}$)
    $$y_{\text{bob}} = y_0 + L \cdot \cos(\theta) \cdot \text{scaleFactor}$$
 
 the math is ofc important, lol.
+
+---
+
+Some amount of AI has been used to debug and help me figure out basic stuff around VSCode and Math Logic as this is the first web playable I have made entirely on my own.
+
 ---
 
 ## 🔮 Future Work
@@ -70,6 +80,7 @@ Future advancements are going to be-
 
 ## 📝 License
 This project is open-source under the [MIT License](LICENSE).
+
 Feel free to make better versions or collaborate!!
 
 ---
