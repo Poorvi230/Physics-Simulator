@@ -9,13 +9,11 @@ I built this because staring at flat, boring physics textbooks wasn't it. It sta
 ### Final Look
 This is what the simulator looks like now— its fully loaded with custom gravity presets, air resistance, crosswinds, different themes, and full Free Body Diagram vector overlays.
 
-| Final Projectile Tracker |
-| --- |
-| ![Final Projectile Build](Preview7.png) |
+Final Projectile Tracker 
+![Final Projectile Build](Preview7.png) 
 
-| Pendulum FBD Engine (With Vector Arrows) |
-| --- |
-| ![Final Pendulum FBD Engine](Preview6.png) |
+Pendulum FBD Engine (With Vector Arrows) 
+![Final Pendulum FBD Engine](Preview6.png)
 
 ### How It Started
 I definitely didn't get it right on the first try. I started out with basic canvas plots before messing around with custom themes.
