@@ -1,89 +1,79 @@
 # 🚀 Physics Simulator
 
-I built this because staring at flat, boring physics textbooks wasn't it. It started as a tiny project inspired by 11th-standard kinematics just to see a projectile actually move, but I ended up hyperfocusing and grinding for 20+ hours (mostly debugging).
-Now it’s a full dual-engine simulator that handles **Projectile Motion** and **Simple Harmonic Motion (SHM)** with real-time vector math.
+I built this because staring at flat, boring physics textbooks wasn't it. It started as a tiny project inspired by my 11th-standard physics class just to see a projectile actually move, but I ended up hyperfocusing and grinding for like 20+ hours on this. Now it’s a full dual-engine simulator that handles **Projectile Motion** and **Simple Harmonic Motion (SHM)** with real-time vector math.
 
-👉 **[Launch the Live Simulator](https://poorvi230.github.io/Physics-Simulator/)**
+👉 **[CHeck this out!](https://poorvi230.github.io/Physics-Simulator/)**
 
 ---
 
-## 📸 Evolution of the Project
+## Evolution of the Project
 
-### The Final Build
-The fully optimized dashboard featuring custom environmental constants, atmospheric drag, crosswinds, different visual themes, and an active vector overlay system.
+### Final Look
+This is what the simulator looks like now— its fully loaded with custom gravity presets, air resistance, crosswinds, different themes, and full Free Body Diagram vector overlays.
 
 | Final Projectile Tracker | Pendulum FBD Engine (Live Vector Arrows) |
 | --- | --- |
 | ![Final Projectile Build](Preview7.png) | ![Final Pendulum FBD Engine](Preview6.png) |
 
-### How It Started vs. How It Went
-Tthe development phases- from basic canvas plots to managing frequency waves and custom UI themes. 
+### How It Started
+I definitely didn't get it right on the first try. I started out with basic canvas plots before messing around with custom themes.
 
-| Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme | Phase 3: SHM Wave Testing |
-| --- | --- | --- |
-| ![Initial Plotting](Preview3.png) | ![Neon Theme Trial](Preview1.png) | ![SHM Frequency Plots](Preview5.png) |
+| Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme |
+| --- | --- |
+| ![Initial Plotting](Preview3.png) | ![Neon Theme Trial](Preview1.png) |
 
-> ⚠️ **Debugging Note on Phase 3:** This phase was where the code went completely bonkers. Most of the development time was spent right here trying to debug the canvas rendering engine because it kept overlaying the old projectile coordinate lines underneath the active spring harmonic waves.
+### The Phase Where the Code Went Bonkers 
+Most of my development time was spent right here trying to debug the canvas rendering engine for the SHM waves. It was going bonkers and kept drawing the old projectile coordinate lines underneath the active spring harmonic waves. Figuring out how to completely clear and isolate the canvas state took hours of trial and error.
+
+![SHM Frequency Plots](Preview5.jpg)
 
 *(Testing boundary limits: a high-altitude trajectory simulated under the Moon's gravitational constant).*
 ![High Altitude Moon Launch Trial](Preview4.png)
 
 ---
 
-## 🎨 Core Features
+## 🎨 What this simulator actually does
 
-* **🏹 Track A: Projectile Motion Engine**
-  * Sliders to tweak Velocity, Launch Angle, and Initial Height on the fly.
-  * Environmental variables like Gravity presets (Earth, Moon, Space), Air Resistance, and Crosswinds.
-  * Live stats tracking Max Height, Total Flight Time, and Horizontal Range.
+* ** Track A: Projectile Motion Engine**
+  * You get sliders to change the velocity, launch angle, and height whenever you want.
+  * Can also change environmental stuff like gravity (Earth, Moon, Space presets), air resistance, and crosswinds.
+  * It shows you live stats for max height, flight time, and the total horizontal range.
 
-* **🌀 Track B: Simple Harmonic Motion (SHM) Engine**
-  * **Linear Mode:** Generates a clean, isolated Displacement vs. Time sine wave graph tracking boundaries from $-A \to +A$.
-  * **Angular Mode:** Simulates a mathematically precise swinging pendulum anchored to a top-center pivot point.
-  * **Free Body Diagram (FBD) Overlay:** A toggle that draws live, color-coded force vectors directly from the center of the moving bob showing **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
+* ** Track B: Simple Harmonic Motion (SHM) Engine**
+  * **Linear Mode:** Draws a clean, isolated Displacement vs. Time sine wave graph from $-A \to +A$.
+  * **Angular Mode:** A mathematically exact swinging pendulum anchored to a top-center pivot point.
+  * **Free Body Diagram (FBD) Overlay:** A toggle that draws live, color-coded force vectors right on the moving bob showing **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
 
 ---
 
-## 🧮 The Math Pipeline
+## A lil Math
 
-The pendulum engine calculates true physical states frame-by-frame ($\Delta t = 0.016\text{s}$) rather than relying on basic linear approximations:
+The pendulum calculates real physics frame-by-frame ($\Delta t = 0.016\text{s}$) so the string actually stays attached to the bob:
 
 1. **Angular Acceleration ($\alpha$):**
    $$\alpha = -\frac{g}{L} \sin(\theta)$$
-2. **State Updates:**
+2. **Velocity & Angle Updates:**
    $$\omega_{\text{new}} = \omega_{\text{old}} + \alpha \cdot \Delta t$$
    $$\theta_{\text{new}} = \theta_{\text{old}} + \omega_{\text{new}} \cdot \Delta t$$
-3. **Canvas Geometric Mapping:**
+3. **Canvas Position Mapping:**
    $$x_{\text{bob}} = x_0 + L \cdot \sin(\theta) \cdot \text{scaleFactor}$$
    $$y_{\text{bob}} = y_0 + L \cdot \cos(\theta) \cdot \text{scaleFactor}$$
 
+the math is ofc important, lol.
 ---
 
-## Inspiration
-- 11th Grade Physics Textbook
-  
----
+## 🔮 Future Work
 
-## Future Work
-
-Future development plans include:
-* Expanding the dashboard to include a wider variety of experiments (like wave optics or circular motion mechanics).
-* Upgrading the UI/UX layout to for more smoother and interactive experience.
-
----
-
-### 🎨 Creative Corner
-I also dedicated around 3 hours to making artwork which has always been a piece of me, you'll be seeing more in projects ahead!
-
-| Art Concept 1 | Art Concept 2 |
-| --- | --- |
-| ![Art Concept 1](art1.jpeg) | ![Art Concept 2](art2.jpeg) |
+Future advancements are going to be-
+* Adding even more physics experiments to the dashboard (like wave optics or circular motion mechanics).
+* Making the UI/UX cleaner and better to use.
 
 ---
 
 ## 📝 License
 This project is open-source under the [MIT License](LICENSE).
-Mess around however u like!
+Feel free to make better versions or collaborate!!
 
 ---
-Built with a great deal of effort. Hope you like it!
+
+Put a massive amount of effort into building this and getting the math right. Hope you like it!
