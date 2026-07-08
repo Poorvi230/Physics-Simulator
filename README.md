@@ -32,12 +32,12 @@ Most of my development time was spent right here trying to debug the canvas rend
 
 ## 🎨 What this simulator actually does
 
-* ** Track A: Projectile Motion Engine**
+* Track A: Projectile Motion Engine
   * You get sliders to change the velocity, launch angle, and height whenever you want.
   * Can also change environmental stuff like gravity (Earth, Moon, Space presets), air resistance, and crosswinds.
   * It shows you live stats for max height, flight time, and the total horizontal range.
 
-* ** Track B: Simple Harmonic Motion (SHM) Engine**
+* Track B: Simple Harmonic Motion (SHM) Engine
   * **Linear Mode:** Draws a clean, isolated Displacement vs. Time sine wave graph from $-A \to +A$.
   * **Angular Mode:** A mathematically exact swinging pendulum anchored to a top-center pivot point.
   * **Free Body Diagram (FBD) Overlay:** A toggle that draws live, color-coded force vectors right on the moving bob showing **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
