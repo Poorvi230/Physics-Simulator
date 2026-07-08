@@ -6,8 +6,6 @@ I built this because staring at flat, boring physics textbooks wasn't it. It sta
 
 ---
 
-## Evolution of the Project
-
 ### Final Look
 This is what the simulator looks like now— its fully loaded with custom gravity presets, air resistance, crosswinds, different themes, and full Free Body Diagram vector overlays.
 
@@ -20,15 +18,15 @@ I definitely didn't get it right on the first try. I started out with basic canv
 
 | Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme |
 | --- | --- |
-| ![Initial Plotting](Preview3.png) | ![Neon Theme Trial](Preview1.png) |
+| ![Initial Plotting](Preview3.png) | ![Color Theme Change](Preview1.png) |
 
 ### The Phase Where the Code Went Bonkers 
 Most of my development time was spent right here trying to debug the canvas rendering engine for the SHM waves. It was going bonkers and kept drawing the old projectile coordinate lines underneath the active spring harmonic waves. Figuring out how to completely clear and isolate the canvas state took hours of trial and error.
 
-![SHM Frequency Plots](Preview5.png)
+![Frequency Plots](Preview5.png)
 
-*(Testing boundary limits: a high-altitude trajectory simulated under the Moon's gravitational constant).*
-![High Altitude Moon Launch Trial](Preview4.png)
+
+![Ball leaving Earth](Preview4.png)
 
 ---
 
