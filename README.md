@@ -1,86 +1,58 @@
-# 🚀 Physics Simulator
+# Physics Simulator
 
-I built this because staring at flat, boring physics textbooks wasn't it. It started as a tiny project inspired by my 11th-standard physics class just to see a projectile actually move, but I ended up hyperfocusing and grinding for like 20+ hours on this. Now it’s a full dual-engine simulator that handles **Projectile Motion** and **Simple Harmonic Motion (SHM)** with real-time vector math.
+I realized my last year's 11th grade physics class was so boring, the textbook ofc. So i decided to actually make the stuff move instead of staring at a textbook. started as a tiny projectile plot and then i was like lets add something else. now it's a dual-engine simulator that runs Projectile Motion and Simple Harmonic Motion with real-time vector math.
 
-👉 **[Experiment](https://poorvi230.github.io/Physics-Simulator/)**
+**try it here:** [https://poorvi230.github.io/Physics-Simulator/](https://poorvi230.github.io/Physics-Simulator/)
 
----
+## screenshots
 
-### Final Look
-This is what the simulator looks like now— its fully loaded with custom gravity presets, air resistance, crosswinds, different themes, and full Free Body Diagram vector overlays.
+go through thewhole journey, ehh
 
-Final Projectile Tracker 
-![Final Projectile Build](Preview7.png) 
+[![preview1](Preview1.png)](Preview1.png)
+[![preview2](Preview2.png)](Preview2.png)
+[![preview3](Preview3.png)](Preview3.png)
+[![preview4](Preview4.png)](Preview4.png)
+[![preview5](Preview5.png)](Preview5.png)
+[![preview6](Preview6.png)](Preview6.png)
+[![preview7](Preview7.png)](Preview7.png)
 
-Pendulum FBD Engine (With Vector Arrows) 
-![Final Pendulum FBD Engine](Preview6.png)
+## what it does
 
-### How It Started
-I definitely didn't get it right on the first try. I started out with basic canvas plots before messing around with custom themes.
+- **projectile motion** — sliders for velocity, angle, height. change gravity (earth/moon/space), air resistance, and crosswinds. live stats for max height, flight time, range
+- **simple harmonic motion** — linear mode draws a clean displacement vs time sine wave. angular mode runs a pendulum with a full free body diagram overlay showing gravity, tension, and net restoring force vectors in real time
 
-| Phase 1: Core Trajectory | Phase 2: Testing the Neon Theme |
-| --- | --- |
-| ![Initial Plotting](Preview3.png) | ![Color Theme Change](Preview1.png) |
+## the math (roughly)
 
-### The Phase Where the Code Went Bonkers 
-Most of my development time was spent right here trying to debug the canvas rendering engine for the SHM waves. It was going bonkers and kept drawing the old projectile coordinate lines underneath the active spring harmonic waves. Figuring out how to completely clear and isolate the canvas state took hours of trial and error.
+the pendulum updates frame-by-frame (delta t = 0.016s) so the string stays connected to the bob:
 
-![Frequency Plots](Preview5.png)
+- angular acceleration: α = -(g/L) sin(θ)
+- velocity/angle: ω_new = ω_old + α·Δt, θ_new = θ_old + ω_new·Δt
+- canvas position: x = x₀ + L·sin(θ)·scale, y = y₀ + L·cos(θ)·scale
 
+## how it works
 
-![Ball leaving Earth](Preview4.png)
+- dual-engine setup switches between projectile and SHM with isolated canvas rendering
+- projectile uses real kinematic equations with configurable drag coefficients
+- SHM pendulum runs euler integration per frame with a vector overlay drawn on top
+- all themes and UI are custom css, no frameworks
+- the projectile and shm engines each have their own js file to keep things modular
 
----
+## built with
 
-## 🎨 What this simulator actually does
+- vanilla javascript (no frameworks)
+- html5 canvas api
+- raw css
 
-* Track A: Projectile Motion Engine
-  * You get sliders to change the velocity, launch angle, and height whenever you want.
-  * Can also change environmental stuff like gravity (Earth, Moon, Space presets), air resistance, and crosswinds.
-  * It shows you live stats for max height, flight time, and the total horizontal range.
+## ai usage
 
-* Track B: Simple Harmonic Motion (SHM) Engine
-  * **Linear Mode:** It draws a clean, isolated Displacement vs. Time sine wave graph from $-A \to +A$.
-  * **Angular Mode:** A pendulum which also shows a free body diagram.
-  * **Free Body Diagram (FBD) Overlay:** It draws live, color-coded force vectors right on the moving bob showing -
-    - **Gravity ($F_g$)**, **Tension ($T$)**, and **Net Restoring Force ($F_{\text{net}}$)**.
+used ai to debug canvas rendering bugs and help with some of the math logic. everything else was me, including all game design and testing.
+manual debugging had me humbled at sm point.
 
----
+## future work
 
-## A lil Math
+- more physics experiments (wave optics, circular motion, etc)
+- cleaner ui/ux
 
-The pendulum calculates real physics frame-by-frame ($\Delta t = 0.016\text{s}$) so the string actually stays attached to the bob:
+## license
 
-1. **Angular Acceleration ($\alpha$):**
-   $$\alpha = -\frac{g}{L} \sin(\theta)$$
-2. **Velocity & Angle Updates:**
-   $$\omega_{\text{new}} = \omega_{\text{old}} + \alpha \cdot \Delta t$$
-   $$\theta_{\text{new}} = \theta_{\text{old}} + \omega_{\text{new}} \cdot \Delta t$$
-3. **Canvas Position Mapping:**
-   $$x_{\text{bob}} = x_0 + L \cdot \sin(\theta) \cdot \text{scaleFactor}$$
-   $$y_{\text{bob}} = y_0 + L \cdot \cos(\theta) \cdot \text{scaleFactor}$$
-
-the math is ofc important, lol.
-
----
-
-Some amount of AI has been used to debug and help me figure out basic stuff around VSCode and Math Logic as this is the first web playable I have made entirely on my own.
-
----
-
-## 🔮 Future Work
-
-Future advancements are going to be-
-* Adding even more physics experiments to the dashboard (like wave optics or circular motion mechanics).
-* Making the UI/UX cleaner and better to use.
-
----
-
-## 📝 License
-This project is open-source under the [MIT License](LICENSE).
-
-Feel free to make better versions or collaborate!!
-
----
-
-Put a massive amount of effort into building this and getting the math right. Hope you like it!
+MIT
